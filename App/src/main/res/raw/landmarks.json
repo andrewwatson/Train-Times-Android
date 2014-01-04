@@ -1,0 +1,24 @@
+{
+    "landmarks": [
+        {
+            "name": "Chamblee Station",
+            "latitude": 33.886191,
+            "longitude": -84.306957
+        },
+        {
+            "name": "Arts Center Station",
+            "latitude": 33.789705,
+            "longitude": -84.387789
+        },
+        {
+            "name": "Doraville Station",
+            "latitude": 33.902079,
+            "longitude": -84.280389
+        },
+        {
+            "name": "Midtown Station",
+            "latitude": 33.781121,
+            "longitude": -84.386345
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MARTA Station Train Times</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_default">Make Default</string>
+    <string name="feedback_default_updated">Default Station Updated</string>
+    <string name="feedback_default_notupdated">Default Station Not Updated</string>
+    <string name="train_times_header">According to the Schedule...</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="intro_header">
+        This app can probably tell what MARTA station you are closest to and
+        when the next train will arrive.
+    </string>
+    <string name="go_button">Go!</string>
+    <string name="snarky_footer">then again, maybe it can\'t!</string>
+    <string name="shared_preference_key">com.andrewmoorewatson.apps.traintimes.preferences</string>
+    <string name="title_activity_test">TestActivity</string>
+
+    <string name="nearest_station">Nearest Station:</string>
+    <string name="nearest_disclaimer">(within %d km)</string>
+</resources>
