@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.AsyncTask;
@@ -29,12 +30,14 @@ import java.util.List;
 
 public class HomeActivity extends Activity {
 
+
     private static Landmarks mLandmarks;
     private static List<Place> nearbyLandmarks;
 
     private static LocationManager mLocationManager;
 
-    private Place currentLocation;
+    private Place currentLocationPlace;
+    private Location currentLocation;
 
     private TextView nearestStationView;
     private TextView locationView;
@@ -77,6 +80,31 @@ public class HomeActivity extends Activity {
             }
         });
 
+        LocationListener locationListener = new LocationListener() {
+
+            public void onLocationChanged(Location location) {
+                // Called when a new location is found by the network location provider.
+
+                Logger.debug("LOCATION UPDATE " + location.getLatitude());
+
+                if (currentLocation == null || (Locator.isBetterLocation(location, currentLocation))) {
+                    currentLocationPlace = new Place(location);
+                    currentLocation = location;
+
+                    Logger.debug("Shutting down notifications from Location Manager");
+                    mLocationManager.removeUpdates(this);
+                }
+
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+            public void onProviderEnabled(String provider) {}
+
+            public void onProviderDisabled(String provider) {}
+        };
+
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
 
     @Override
@@ -122,6 +150,8 @@ public class HomeActivity extends Activity {
 
         @Override
         protected Hashtable<String, Place> doInBackground(String... params) {
+
+            Locator locator = new Locator();
 
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
