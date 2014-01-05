@@ -14,12 +14,22 @@ public class Place implements Serializable {
     private final double mLongitude;
     private final String mName;
     private double mDistanceAway;
+    private String mVenue;
 
     public Place(Location location) {
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
         mName = "";
         mDistanceAway = 0.0;
+        mVenue = "";
+    }
+
+    public Place(double latitude, double longitude, String name, String venueID) {
+        mLatitude = latitude;
+        mLongitude = longitude;
+        mName = name;
+        mVenue = venueID;
+
     }
 
     /**
@@ -34,6 +44,7 @@ public class Place implements Serializable {
         mLongitude = longitude;
         mName = name;
         mDistanceAway = 0.0;
+        mVenue = "";
     }
 
     /**
@@ -50,8 +61,16 @@ public class Place implements Serializable {
         mDistanceAway = distanceAway;
     }
 
+    public void setVenue(String venueID) {
+        mVenue = venueID;
+    }
+
     public void setDistanceAway(double distance) {
         mDistanceAway = distance;
+    }
+
+    public String getVenue() {
+        return mVenue;
     }
 
     /**

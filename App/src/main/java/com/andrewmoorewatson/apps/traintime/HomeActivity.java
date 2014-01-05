@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,7 +61,9 @@ public class HomeActivity extends Activity {
         DetermineLocationTask determiner = new DetermineLocationTask();
         determiner.execute();
 
-        Toast.makeText(this, "Updating Location", Toast.LENGTH_LONG);
+        Toast updateToast = Toast.makeText(this, "Updating Location", Toast.LENGTH_SHORT);
+        updateToast.setGravity(Gravity.CENTER_VERTICAL, 0,0);
+        updateToast.show();
     }
 
     public void onResume() {
@@ -100,7 +103,18 @@ public class HomeActivity extends Activity {
 
         protected TrainSchedule doInBackground(String... params) {
 
-            return null;
+            Logger.debug("Starting ASYNC Task");
+            TrainSchedule schedule = new TrainSchedule();
+
+            for (String venue: params) {
+                schedule = TrainSchedule.getSchedule(venue);
+            }
+
+            return schedule;
+        }
+
+        protected void onPostExecute(TrainSchedule schedule) {
+
         }
     }
 
@@ -109,7 +123,6 @@ public class HomeActivity extends Activity {
         @Override
         protected Hashtable<String, Place> doInBackground(String... params) {
 
-            Logger.debug("Starting ASYNC Task");
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
@@ -123,8 +136,6 @@ public class HomeActivity extends Activity {
             double myLatitude = 33.789715;
             double myLongitude = -84.387769;
 
-            Place closestStation = new Place(myLatitude, myLongitude, "Default");
-
             if (bestProvider != null) {
                 Location mLocation = mLocationManager.getLastKnownLocation(bestProvider);
 
@@ -132,12 +143,16 @@ public class HomeActivity extends Activity {
 
                 if (mLocation != null) {
                     Logger.debug("LATx " + mLocation.getLatitude());
-                    closestStation = mLandmarks.getClosestPlace(
+                    Place closestStation = mLandmarks.getClosestPlace(
                             mLocation.getLatitude(),
                             mLocation.getLongitude()
                     );
 
                     results.put("location", currentPlace);
+                    if (closestStation != null) {
+                        Logger.debug("CLOSEST: " + closestStation.getVenue());
+                        results.put("closest", closestStation);
+                    }
 
                 } else {
                     Logger.debug("last known location unavailable");
@@ -148,13 +163,12 @@ public class HomeActivity extends Activity {
 
             try {
                 Thread.sleep(500);
-                Logger.debug("Ok I'm awake");
+//                Logger.debug("Ok I'm awake");
 
             } catch (InterruptedException e) {
 
             }
 
-            results.put("closest", closestStation);
             return results;
         }
 
@@ -163,8 +177,7 @@ public class HomeActivity extends Activity {
             Place mLocation = results.get("location");
             Place closestStation = results.get("closest");
 
-            Logger.debug("LOCATION FOUND LAT " + mLocation.getLatitude() + " LONG " + mLocation.getLongitude());
-            Logger.debug("STATION FOUND LAT " + closestStation.getLatitude() + " LONG " + closestStation.getLongitude());
+//            Logger.debug("LOCATION FOUND LAT " + mLocation.getLatitude() + " LONG " + mLocation.getLongitude());
 
             locationView = (TextView) findViewById(R.id.location);
             nearestStationView = (TextView) findViewById(R.id.nearestStation);
@@ -180,7 +193,7 @@ public class HomeActivity extends Activity {
 
             if (closestStation != null) {
                 Logger.debug("Closest Station is " + closestStation.getName());
-                Logger.debug("Station is " + closestStation.getDistanceAway() + " km away");
+//                Logger.debug("Station is " + closestStation.getDistanceAway() + " km away");
 
                 if (nearestStationView == null) {
                     Logger.debug("nearestStationView is null!");
@@ -189,6 +202,10 @@ public class HomeActivity extends Activity {
                     distanceAwayView.setText(closestStation.getDistanceAway() + " km away");
                 }
             }
+
+            DetermineScheduleTask scheduleDeterminer = new DetermineScheduleTask();
+            scheduleDeterminer.execute(closestStation.getVenue());
+
 
         }
     }

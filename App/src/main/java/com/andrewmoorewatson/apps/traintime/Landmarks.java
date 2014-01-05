@@ -46,6 +46,7 @@ public class Landmarks {
         // a significant penalty to the application. If the landmark data were much larger,
         // we may want to load it in the background instead.
         String jsonString = readLandmarksResource(context);
+//        Logger.debug(jsonString);
         populatePlaceList(jsonString);
     }
 
@@ -78,6 +79,8 @@ public class Landmarks {
 
         for (Place knownPlace : mPlaces) {
 
+            Logger.debug("CHECK PLACE: " + knownPlace.getName());
+
             double placeDistance = MathUtils.getDistance(latitude, longitude,
                     knownPlace.getLatitude(), knownPlace.getLongitude());
 
@@ -105,6 +108,7 @@ public class Landmarks {
             if (array != null) {
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject object = array.optJSONObject(i);
+
                     Place place = jsonObjectToPlace(object);
                     if (place != null) {
                         mPlaces.add(place);
@@ -112,7 +116,7 @@ public class Landmarks {
                 }
             }
         } catch (JSONException e) {
-            Log.e(TAG, "Could not parse landmarks JSON string", e);
+            Logger.error("Could not parse landmarks JSON string " + e.getMessage());
         }
     }
 
@@ -123,9 +127,12 @@ public class Landmarks {
         String name = object.optString("name");
         double latitude = object.optDouble("latitude", Double.NaN);
         double longitude = object.optDouble("longitude", Double.NaN);
+        String venue = object.optString("venue", "");
 
+        Logger.debug("MAKE PLACE " + name);
         if (!name.isEmpty() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-            return new Place(latitude, longitude, name);
+
+            return new Place(latitude, longitude, name, venue);
         } else {
             return null;
         }

@@ -3,22 +3,26 @@
         {
             "name": "Chamblee Station",
             "latitude": 33.886191,
-            "longitude": -84.306957
+            "longitude": -84.306957,
+            "venue": "4a243cd5f964a520067e1fe3"
         },
         {
             "name": "Arts Center Station",
             "latitude": 33.789705,
-            "longitude": -84.387789
+            "longitude": -84.387789,
+            "venue": "49e8940ef964a52054651fe3"
         },
         {
             "name": "Doraville Station",
             "latitude": 33.902079,
-            "longitude": -84.280389
+            "longitude": -84.280389,
+            "venue": "4a8f138df964a520d71320e3"
         },
         {
             "name": "Midtown Station",
             "latitude": 33.781121,
-            "longitude": -84.386345
+            "longitude": -84.386345,
+            "venue": "49e68f38f964a52055641fe3"
         }
     ]
 }
