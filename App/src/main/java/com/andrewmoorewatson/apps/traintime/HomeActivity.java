@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.location.Criteria;
 import android.widget.Toast;
@@ -66,7 +67,7 @@ public class HomeActivity extends Activity {
         super.onResume();
         updateLocation();
 
-        final Button button = (Button) findViewById(R.id.button);
+        final ImageButton button = (ImageButton) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 updateLocation();
@@ -93,6 +94,14 @@ public class HomeActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class DetermineScheduleTask extends AsyncTask<String, Void, TrainSchedule> {
+
+        protected TrainSchedule doInBackground(String... params) {
+
+            return null;
+        }
     }
 
     private class DetermineLocationTask extends AsyncTask<String, Void, Hashtable<String, Place>> {
@@ -138,7 +147,7 @@ public class HomeActivity extends Activity {
             }
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(500);
                 Logger.debug("Ok I'm awake");
 
             } catch (InterruptedException e) {
