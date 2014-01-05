@@ -23,4 +23,7 @@
     <string name="nearest_station">Nearest Station:</string>
     <string name="nearest_disclaimer">(within %d km)</string>
     <string name="traintimes_header">Train Schedule</string>
+    <string name="no_trains">No Trains</string>
+    <string name="trains_loading">Loading...</string>
+    <string name="your_location_header">Your Location</string>
 </resources>
