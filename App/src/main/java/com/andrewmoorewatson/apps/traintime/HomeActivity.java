@@ -7,6 +7,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,9 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.Button;
 import android.widget.TextView;
 import android.location.Criteria;
+import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.List;
 
 public class HomeActivity extends Activity {
@@ -25,6 +31,13 @@ public class HomeActivity extends Activity {
     private static List<Place> nearbyLandmarks;
 
     private static LocationManager mLocationManager;
+
+    private Place currentLocation;
+
+    private TextView nearestStationView;
+    private TextView locationView;
+    private TextView distanceAwayView;
+    private TextView lastUpdateView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +52,28 @@ public class HomeActivity extends Activity {
 
         mLandmarks = new Landmarks(this);
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
     }
 
+    public void updateLocation() {
+        DetermineLocationTask determiner = new DetermineLocationTask();
+        determiner.execute();
+
+        Toast.makeText(this, "Updating Location", Toast.LENGTH_LONG);
+    }
+
+    public void onResume() {
+        super.onResume();
+        updateLocation();
+
+        final Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                updateLocation();
+            }
+        });
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -62,32 +95,18 @@ public class HomeActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        private Place getCurrentLocation() {
-            Place place = new Place(0.0,0.0, "");
-
-            return place;
-        }
+    private class DetermineLocationTask extends AsyncTask<String, Void, Hashtable<String, Place>> {
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-            return rootView;
-        }
+        protected Hashtable<String, Place> doInBackground(String... params) {
 
-        public void updateLocation() {
+            Logger.debug("Starting ASYNC Task");
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
             String bestProvider = mLocationManager.getBestProvider(criteria, true);
+
+            Hashtable<String, Place> results = new Hashtable<String, Place>(2);
 
             /**
              * Arts Center Marta Station
@@ -95,13 +114,21 @@ public class HomeActivity extends Activity {
             double myLatitude = 33.789715;
             double myLongitude = -84.387769;
 
+            Place closestStation = new Place(myLatitude, myLongitude, "Default");
+
             if (bestProvider != null) {
                 Location mLocation = mLocationManager.getLastKnownLocation(bestProvider);
 
+                Place currentPlace = new Place(mLocation);
+
                 if (mLocation != null) {
-                    Logger.debug("LAT " + mLocation.getLatitude());
-                    myLatitude = mLocation.getLatitude();
-                    myLongitude = mLocation.getLongitude();
+                    Logger.debug("LATx " + mLocation.getLatitude());
+                    closestStation = mLandmarks.getClosestPlace(
+                            mLocation.getLatitude(),
+                            mLocation.getLongitude()
+                    );
+
+                    results.put("location", currentPlace);
 
                 } else {
                     Logger.debug("last known location unavailable");
@@ -110,19 +137,37 @@ public class HomeActivity extends Activity {
                 Logger.debug("No Provider Available");
             }
 
-            View rootView = this.getView();
+            try {
+                Thread.sleep(2000);
+                Logger.debug("Ok I'm awake");
 
-            if (rootView == null) {
-                Logger.debug("No View Attached");
-                return;
+            } catch (InterruptedException e) {
+
             }
 
-            TextView location = (TextView) rootView.findViewById(R.id.location);
-            location.setText(myLatitude + ", " + myLongitude);
+            results.put("closest", closestStation);
+            return results;
+        }
 
-            Place closestStation = mLandmarks.getClosestPlace(myLatitude, myLongitude);
-            TextView nearestStationView = (TextView) rootView.findViewById(R.id.nearestStation);
-            TextView distanceAwayView = (TextView) rootView.findViewById(R.id.distanceAway);
+        protected void onPostExecute(Hashtable<String, Place> results) {
+
+            Place mLocation = results.get("location");
+            Place closestStation = results.get("closest");
+
+            Logger.debug("LOCATION FOUND LAT " + mLocation.getLatitude() + " LONG " + mLocation.getLongitude());
+            Logger.debug("STATION FOUND LAT " + closestStation.getLatitude() + " LONG " + closestStation.getLongitude());
+
+            locationView = (TextView) findViewById(R.id.location);
+            nearestStationView = (TextView) findViewById(R.id.nearestStation);
+            distanceAwayView = (TextView) findViewById(R.id.distanceAway);
+            lastUpdateView = (TextView) findViewById(R.id.lastUpdatedView);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            Calendar cal = Calendar.getInstance();
+            String lastUpdated = sdf.format(cal.getTime());
+
+            locationView.setText(mLocation.getLatitude() + ", " + mLocation.getLongitude());
+            lastUpdateView.setText(lastUpdated);
 
             if (closestStation != null) {
                 Logger.debug("Closest Station is " + closestStation.getName());
@@ -135,17 +180,22 @@ public class HomeActivity extends Activity {
                     distanceAwayView.setText(closestStation.getDistanceAway() + " km away");
                 }
             }
+
         }
-        public void onResume() {
-            super.onResume();
-            Logger.debug("RESUME");
-            updateLocation();
+    }
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+
+        public PlaceholderFragment() {
         }
 
-        public void onStart() {
-            super.onStart();
-            Logger.debug("START");
-//            updateLocation();
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+            return rootView;
         }
 
     }

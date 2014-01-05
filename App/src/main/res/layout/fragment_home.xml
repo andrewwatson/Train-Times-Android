@@ -7,7 +7,9 @@ android:paddingRight="@dimen/activity_horizontal_margin"
 android:paddingTop="@dimen/activity_vertical_margin"
 android:paddingBottom="@dimen/activity_vertical_margin"
 tools:context="com.andrewmoorewatson.apps.traintime.HomeActivity$PlaceholderFragment"
-    android:id="@+id/longitude">
+    android:id="@+id/longitude"
+    android:background="#000000"
+    android:clickable="true">
 
 <TextView
     android:layout_width="wrap_content"
@@ -19,7 +21,8 @@ tools:context="com.andrewmoorewatson.apps.traintime.HomeActivity$PlaceholderFrag
     android:layout_alignParentTop="true"
     android:layout_alignParentStart="true"
     android:textSize="18sp"
-    android:layout_centerHorizontal="true" />
+    android:layout_centerHorizontal="true"
+    android:textColor="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -27,31 +30,35 @@ tools:context="com.andrewmoorewatson.apps.traintime.HomeActivity$PlaceholderFrag
         android:text="@string/nearest_station"
         android:id="@+id/nearestStationHeader"
         android:textStyle="bold"
-        android:textColor="#000000"
+        android:textColor="#ffffff"
         android:textSize="24sp"
         android:textIsSelectable="false"
-        android:layout_below="@+id/button"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/lastUpdatedLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="None"
-        android:layout_marginTop="18dp"
         android:textSize="18sp"
         android:id="@+id/nearestStation"
+        android:textIsSelectable="true"
         android:layout_below="@+id/nearestStationHeader"
         android:layout_alignParentStart="true"
-        android:textIsSelectable="true" />
+        android:layout_marginTop="8dp"
+        android:textColor="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/location"
-        android:layout_marginBottom="64dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:text="Unknown"
+        android:layout_alignParentStart="false"
+        android:textIsSelectable="true"
+        android:textColor="#ffffff"
+        android:layout_below="@+id/currentLocation" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,7 +66,8 @@ tools:context="com.andrewmoorewatson.apps.traintime.HomeActivity$PlaceholderFrag
         android:text=""
         android:id="@+id/distanceAway"
         android:layout_below="@+id/nearestStation"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textColor="#cecece" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -67,8 +75,13 @@ tools:context="com.andrewmoorewatson.apps.traintime.HomeActivity$PlaceholderFrag
         android:layout_height="wrap_content"
         android:text="Refresh"
         android:id="@+id/button"
+        android:textColor="#ffffff"
+        android:background="#bababa"
         android:layout_alignTop="@+id/currentLocation"
-        android:layout_toRightOf="@+id/nearestStationHeader" />
+        android:layout_alignEnd="@+id/textView"
+        android:layout_toRightOf="@+id/currentLocation"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -77,9 +90,89 @@ tools:context="com.andrewmoorewatson.apps.traintime.HomeActivity$PlaceholderFrag
         android:id="@+id/currentLocation"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginTop="12dp"
+        android:textColor="#ffffff"
         android:layout_below="@+id/textView"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="12dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/train_times_header"
+        android:id="@+id/trainTimesHeader"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:textIsSelectable="false"
+        android:layout_below="@+id/distanceAway"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RED"
+        android:textSize="24sp"
+        android:textColor="#FF0000"
+        android:textStyle="bold"
+        android:id="@+id/redLabel"
+        android:layout_below="@+id/trainTimesHeader" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#FFFF00"
+        android:textStyle="bold"
+        android:text="GOLD"
+        android:id="@+id/goldLabel"
+        android:layout_below="@+id/redLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#00FF00"
+        android:textStyle="bold"
+        android:text="GREEN"
+        android:id="@+id/greenLabel"
+        android:layout_below="@+id/goldLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#7978ff"
+        android:textStyle="bold"
+        android:text="BLUE"
+        android:id="@+id/blueLabel"
+        android:layout_below="@+id/greenLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last Updated: "
+        android:id="@+id/lastUpdatedLabel"
+        android:layout_below="@+id/location"
+        android:layout_alignParentStart="true"
+        android:textColor="#e0e0e0"
+        android:layout_marginTop="4dp"
+        android:textStyle="bold|italic" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Never"
+        android:id="@+id/lastUpdatedView"
+        android:textColor="#e0e0e0"
+        android:layout_alignTop="@+id/lastUpdatedLabel"
+        android:layout_toRightOf="@+id/lastUpdatedLabel"
+        android:textStyle="italic" />
 </RelativeLayout>

@@ -1,15 +1,26 @@
 package com.andrewmoorewatson.apps.traintime;
 
+import android.location.Location;
+
+import java.io.Serializable;
+
 /**
  * This class represents a point of interest that has geographical coordinates (latitude and
  * longitude) and a name that is displayed to the user.
  */
-public class Place {
+public class Place implements Serializable {
 
     private final double mLatitude;
     private final double mLongitude;
     private final String mName;
     private double mDistanceAway;
+
+    public Place(Location location) {
+        mLatitude = location.getLatitude();
+        mLongitude = location.getLongitude();
+        mName = "";
+        mDistanceAway = 0.0;
+    }
 
     /**
      * Initializes a new place with the specified coordinates and name.
