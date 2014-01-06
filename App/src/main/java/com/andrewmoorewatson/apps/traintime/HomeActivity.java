@@ -28,6 +28,8 @@ import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
 
+import fi.foyt.foursquare.api.FoursquareApi;
+
 public class HomeActivity extends Activity {
 
 
@@ -44,10 +46,14 @@ public class HomeActivity extends Activity {
     private TextView distanceAwayView;
     private TextView lastUpdateView;
 
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        context = getApplicationContext();
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
@@ -69,24 +75,28 @@ public class HomeActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        locationToast("Updating Location");
+        locationToast("Updating Location...");
 
         LocationListener locationListener = new LocationListener() {
 
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
 
-                locationToast("Location Updated");
-                Logger.debug("LOCATION UPDATE " + location.getLatitude());
-
                 if (currentLocation == null || (Locator.isBetterLocation(location, currentLocation))) {
                     currentLocationPlace = new Place(location);
                     currentLocation = location;
 
+                    locationToast("Location Updated");
+                    Logger.debug("BETTER LOCATION UPDATE " + location.getLatitude());
+
                     Place closestStation = mLandmarks.getClosestPlace(
                             location.getLatitude(),
-                            location.getLongitude()
+                            location.getLongitude(),
+                            15.0
                     );
+
+                    String clientId = context.getString(R.string.foursquare_client_id);
+                    String clientSecret = context.getString(R.string.foursquare_client_secret);
 
                     locationView = (TextView) findViewById(R.id.location);
                     nearestStationView = (TextView) findViewById(R.id.nearestStation);
@@ -100,21 +110,22 @@ public class HomeActivity extends Activity {
                     locationView.setText(location.getLatitude() + ", " + location.getLongitude());
                     lastUpdateView.setText(lastUpdated);
 
-                    if (closestStation != null) {
-
-                        if (nearestStationView == null) {
-                            Logger.debug("nearestStationView is null!");
-                        } else {
+                    if (nearestStationView != null) {
+                        if (closestStation != null) {
                             nearestStationView.setText(closestStation.getName());
                             distanceAwayView.setText(closestStation.getDistanceAway() + " km away");
+
+                            DetermineScheduleTask scheduleDeterminer = new DetermineScheduleTask();
+                            scheduleDeterminer.execute(closestStation.getVenue());
+
+                            Logger.debug("Shutting down notifications from Location Manager");
+                            mLocationManager.removeUpdates(this);
+
+                        } else {
+                            nearestStationView.setText(R.string.no_station);
                         }
                     }
 
-                    DetermineScheduleTask scheduleDeterminer = new DetermineScheduleTask();
-                    scheduleDeterminer.execute(closestStation.getVenue());
-
-                    Logger.debug("Shutting down notifications from Location Manager");
-                    mLocationManager.removeUpdates(this);
                 }
 
             }
@@ -126,7 +137,8 @@ public class HomeActivity extends Activity {
             public void onProviderDisabled(String provider) {}
         };
 
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30, 0, locationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 0, locationListener);
     }
 
     @Override

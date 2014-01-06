@@ -74,17 +74,19 @@ public class Landmarks {
     }
 
     public Place getClosestPlace(double latitude, double longitude) {
+        return getClosestPlace(latitude, longitude, 100.0);
+    }
+
+    public Place getClosestPlace(double latitude, double longitude, double maximum) {
         Place closestPlace = null;
         double shortestDistance = 0.0;
 
         for (Place knownPlace : mPlaces) {
 
-            Logger.debug("CHECK PLACE: " + knownPlace.getName());
-
             double placeDistance = MathUtils.getDistance(latitude, longitude,
                     knownPlace.getLatitude(), knownPlace.getLongitude());
 
-            if (shortestDistance == 0.0 || placeDistance < shortestDistance) {
+            if ((shortestDistance == 0.0 || placeDistance < shortestDistance) && placeDistance < maximum) {
                 shortestDistance = placeDistance;
                 closestPlace = knownPlace;
                 closestPlace.setDistanceAway(shortestDistance);
@@ -129,7 +131,7 @@ public class Landmarks {
         double longitude = object.optDouble("longitude", Double.NaN);
         String venue = object.optString("venue", "");
 
-        Logger.debug("MAKE PLACE " + name);
+//        Logger.debug("MAKE PLACE " + name);
         if (!name.isEmpty() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 
             return new Place(latitude, longitude, name, venue);

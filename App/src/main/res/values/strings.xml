@@ -26,4 +26,8 @@
     <string name="no_trains">No Trains</string>
     <string name="trains_loading">Loading...</string>
     <string name="your_location_header">Your Location</string>
+    <string name="no_station">No Station Nearby</string>
+
+    <string name="foursquare_client_id">V2LZ3WBBROCUOB5C43RPSABMNNITWAYO0MLWXABVXXKZD5CS</string>
+    <string name="foursquare_client_secret">ED3OTO5SZ55ELJFOUKBYXKYNMTKIYFVSC4NZLMTZ04IZDD0W</string>
 </resources>

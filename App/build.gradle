@@ -14,7 +14,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion '19.0.0'
 
     defaultConfig {
         minSdkVersion 18
@@ -34,4 +34,5 @@ android {
 }
 
 dependencies {
+    compile files('build/libs/foursquare-api-1.0.2.jar')
 }
