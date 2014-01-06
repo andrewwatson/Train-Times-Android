@@ -60,36 +60,58 @@ public class HomeActivity extends Activity {
 
     }
 
-    public void updateLocation() {
-        DetermineLocationTask determiner = new DetermineLocationTask();
-        determiner.execute();
-
-        Toast updateToast = Toast.makeText(this, "Updating Location", Toast.LENGTH_SHORT);
+    public void locationToast(String message) {
+        Toast updateToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
         updateToast.setGravity(Gravity.CENTER_VERTICAL, 0,0);
         updateToast.show();
     }
 
     public void onResume() {
         super.onResume();
-        updateLocation();
 
-        final ImageButton button = (ImageButton) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                updateLocation();
-            }
-        });
+        locationToast("Updating Location");
 
         LocationListener locationListener = new LocationListener() {
 
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
 
+                locationToast("Location Updated");
                 Logger.debug("LOCATION UPDATE " + location.getLatitude());
 
                 if (currentLocation == null || (Locator.isBetterLocation(location, currentLocation))) {
                     currentLocationPlace = new Place(location);
                     currentLocation = location;
+
+                    Place closestStation = mLandmarks.getClosestPlace(
+                            location.getLatitude(),
+                            location.getLongitude()
+                    );
+
+                    locationView = (TextView) findViewById(R.id.location);
+                    nearestStationView = (TextView) findViewById(R.id.nearestStation);
+                    distanceAwayView = (TextView) findViewById(R.id.distanceAway);
+                    lastUpdateView = (TextView) findViewById(R.id.lastUpdatedView);
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    Calendar cal = Calendar.getInstance();
+                    String lastUpdated = sdf.format(cal.getTime());
+
+                    locationView.setText(location.getLatitude() + ", " + location.getLongitude());
+                    lastUpdateView.setText(lastUpdated);
+
+                    if (closestStation != null) {
+
+                        if (nearestStationView == null) {
+                            Logger.debug("nearestStationView is null!");
+                        } else {
+                            nearestStationView.setText(closestStation.getName());
+                            distanceAwayView.setText(closestStation.getDistanceAway() + " km away");
+                        }
+                    }
+
+                    DetermineScheduleTask scheduleDeterminer = new DetermineScheduleTask();
+                    scheduleDeterminer.execute(closestStation.getVenue());
 
                     Logger.debug("Shutting down notifications from Location Manager");
                     mLocationManager.removeUpdates(this);
@@ -222,8 +244,6 @@ public class HomeActivity extends Activity {
             lastUpdateView.setText(lastUpdated);
 
             if (closestStation != null) {
-                Logger.debug("Closest Station is " + closestStation.getName());
-//                Logger.debug("Station is " + closestStation.getDistanceAway() + " km away");
 
                 if (nearestStationView == null) {
                     Logger.debug("nearestStationView is null!");
